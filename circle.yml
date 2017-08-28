@@ -1,0 +1,43 @@
+dependencies:
+  pre:
+  # Build MySQL docker
+  - >
+    docker run
+    --detach
+    --name mysql
+    --publish 127.0.0.1:3306:3306
+    --env MYSQL_ALLOW_EMPTY_PASSWORD='yes'
+    --env MYSQL_DATABASE=playlist_generator
+    mysql:5.7.16
+    ; sleep 10
+  - pip install -r requirements.txt
+  override:
+    - echo "skip npm install"
+
+machine:
+  python:
+    version: 3.4.2
+  pre:
+  # Stop the preinstalled old version of MySQL
+  - sudo service mysql stop
+  environment:
+    PYTHONPATH: src:test:utils/src:utils/test
+    PLAYLIST_GENERATOR_DB_USER: root
+    PLAYLIST_GENERATOR_DB_HOST: 127.0.0.1
+    PLAYLIST_GENERATOR_DB_PORT: 3306
+    PLAYLIST_GENERATOR_DB_NAME: playlist_generator
+  services:
+  - docker
+
+checkout:
+  post:
+  - git submodule sync
+  - git submodule update --init
+
+database:
+  override:
+  - python src/manage.py db upgrade
+
+test:
+  override:
+  - python -m unittest

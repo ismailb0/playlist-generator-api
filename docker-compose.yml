@@ -1,0 +1,54 @@
+server:
+  command: python src/server.py
+  env_file:
+    - .env
+  image: python:3.4
+  working_dir: /mnt
+  volumes:
+    - .:/mnt
+  links:
+   - db
+  ports:
+    - '3000:3000'
+  environment:
+    PLAYLIST_GENERATOR_DB_CONTAINER: DB
+    PLAYLIST_GENERATOR_DB_PW: ''
+    PLAYLIST_GENERATOR_DB_USER: root
+    PLAYLIST_GENERATOR_PORT: 3000
+    IMPORT_PATH: /mnt/test/fixture
+    PYTHONPATH: $PYTHONPATH:src:utils/src
+    PYTHONUSERBASE: /mnt/vendor
+    SERVICE_LOG: server.log
+
+db:
+  command: mysqld --character-set-server=utf8 --sql_mode="ANSI,ONLY_FULL_GROUP_BY,STRICT_ALL_TABLES"
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    MYSQL_DATABASE: playlist_generator
+  image: mysql:5.7.16
+  volumes:
+  - /var/lib/mysql
+
+testserver:
+  command: bash -c "sleep 5 && python -m unittest"
+  environment:
+    PYTHONPATH: $PYTHONPATH:src:test:utils/src:utils/test
+    PYTHONUSERBASE: /mnt/vendor
+    PLAYLIST_GENERATOR_DB_CONTAINER: TESTDB
+    PLAYLIST_GENERATOR_DB_USER: root
+    PLAYLIST_GENERATOR_PORT: 5053
+  image: python:3.4
+  links:
+  - testdb
+  ports:
+  - 5053:5053
+  volumes:
+  - .:/mnt
+  working_dir: /mnt
+
+testdb:
+  command: mysqld --character-set-server=utf8 --sql_mode="ANSI,ONLY_FULL_GROUP_BY,STRICT_ALL_TABLES"
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    MYSQL_DATABASE: playlist_generator
+  image: mysql:5.7.16

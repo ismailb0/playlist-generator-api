@@ -1,0 +1,28 @@
+{
+  "name": "playlist-generator-api",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "docker-compose up -d server",
+    "server:up": "docker-compose up server",
+    "test": "docker-compose run --rm testserver",
+    "deploy:integration": "./node_modules/.bin/shipit integration deploy",
+    "deploy:preprod": "./node_modules/.bin/shipit preprod deploy",
+    "deploy:prod": "./node_modules/.bin/shipit prod deploy",
+    "rollback:integration": "./node_modules/.bin/shipit integration rollback",
+    "rollback:preprod": "./node_modules/.bin/shipit preprod rollback",
+    "rollback:prod": "./node_modules/.bin/shipit prod rollback",
+    "server:connect": "docker exec -it playlistgeneratorapi_server_1 bash",
+    "server:install": "docker-compose run --rm server pip install -r requirements.txt --user --upgrade",
+    "db:connect": "docker exec -it playlistgeneratorapi_db_1 mysql -Uroot playlist_generator",
+    "db:init": "docker-compose run --rm server python src/manage.py db init",
+    "db:upgrade": "docker-compose run --rm server python src/manage.py db upgrade",
+    "db:migrate": "docker-compose run --rm server python src/manage.py db migrate",
+    "db:downgrade": "docker-compose run --rm server python src/manage.py db downgrade"
+  },
+  "devDependencies": {
+    "ssh-pool": "theodo/ssh-pool",
+    "shipit-cli": "^2.0.0",
+    "shipit-deploy": "theodo/shipit-deploy",
+    "shipit-submodule": "^1.0.0"
+  }
+}

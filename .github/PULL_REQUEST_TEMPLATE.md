@@ -1,0 +1,5 @@
+- Trello ticket: [UserStory](url)
+- [ ] The functions lengths are < 25 lines
+- [ ] The functions names are self explanatory
+- [ ] I created my branch from `prod`
+- [ ] I did my PR for branches `integration`, `preprod` et `prod` at the same time
